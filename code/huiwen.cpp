@@ -23,7 +23,7 @@ private:
 	string workAtMid(const string&s);
 };
 string Solution::workAtMid(const string&s){
-	findByTwo(s,1,true);
+	findByTwo(s,0,true);
 	for(int i=1;i<mid;++i){
 		findByone(s,i,true);
 		findByTwo(s,i,true);
@@ -43,9 +43,9 @@ void Solution::init(const string&s){
 
 inline void Solution::settimes(const int& pos,bool type){
 	if(type)
-		times = sz - pos - 1;
+		times = tail - pos;
 	else
-		times = sz - pos - 2;
+		times = tail - pos;
 }
 
 void Solution::checkBetter(const int& pre,const int& lat){
@@ -62,7 +62,7 @@ void Solution::findByone(const string &s,const int &pos,bool side){
 			if(s[--pre]==s[++lat])continue;
 			else break;
 		}
-		if(s[pre]==s[lat]&&pre==0){
+		if(pre==0&&s[pre]==s[lat]){
 			--pre;
 			++lat;
 		}
@@ -73,7 +73,7 @@ void Solution::findByone(const string &s,const int &pos,bool side){
 			if(s[--pre]==s[++lat])continue;
 			else break;
 		}
-		if(s[pre]==s[lat]&&lat==tail){
+		if(lat==tail&&s[pre]==s[lat]){
 			--pre;
 			++lat;
 		}
@@ -86,22 +86,23 @@ void Solution::findByTwo(const string &s,const int &pos,bool side){
 	pre = pos;
 	lat = pos + 1;
 	if(s[pre]!=s[lat])return;
-	if(side)
+	if(side){
 		for(int i=0;i<pos;++i){
 			if(s[--pre]==s[++lat])continue;
 			else break;
 		}
-		if(s[pre]==s[lat]&&pre==0){
+		if(pre==0&&s[pre]==s[lat]){
 			--pre;
 			++lat;
 		}
+	}
 	else{
 		settimes(pos,false);
-		for(int i=0;i<pos;++i){
+		for(int i=0;i<times;++i){
 			if(s[--pre]==s[++lat])continue;
 			else break;
 		}
-		if(s[pre]==s[lat]&&lat==tail){
+		if(lat==tail&&s[pre]==s[lat]){
 			--pre;
 			++lat;
 		}
@@ -110,14 +111,8 @@ void Solution::findByTwo(const string &s,const int &pos,bool side){
 }
 
 		
-int main(int argc,char* argv[]){
+int main(){
 	Solution t;
-	cout<<"The longest is:  "<<t.longestPalindrome(argv[1])<<endl;
+	cout<<"The longest is:  "<<t.longestPalindrome("cbb6")<<endl;
 	return 0;
 }
-	
-
-
-		
-	
-		
