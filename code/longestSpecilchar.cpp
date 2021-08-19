@@ -8,12 +8,13 @@ class Solution {
 public:
 	typedef pair<int,int> stalen;
     int lengthOfLongestSubstring(string s) {
+		if(s.empty())return 0;
 		dowork(s);
 		return res;	
     }
 private:
 	set<char> tmp;
-	int sz,len;
+	int sz,len,borde;
 	int res;
 	void init(const string &s);
 	void dowork(const string& s);	
@@ -23,6 +24,7 @@ private:
 void Solution::init(const string &s){
 	sz = s.size();
 	res = 1;
+	borde = sz - 1;
 	return;
 }
 
@@ -35,7 +37,11 @@ void Solution::check(const int &pos,const string &s){
 			len = i - pos;
 			if(len>res)res = len;
 			break;
-		}
+		}else if(i == borde){
+				len = i - pos + 1;
+				if(len>res)res = len;
+				break;
+			}			
 	return;
 }
 			
@@ -51,7 +57,7 @@ void Solution::dowork(const string &s){
 
 int main(int argc,char *argv[]){
 	Solution t;
-	auto res = t.lengthOfLongestSubstring(argv[1]);
+	auto res = t.lengthOfLongestSubstring("au");
 	cout<<"res is:  "<<res<<endl;
 	return 0;
 }
