@@ -328,8 +328,97 @@ cout<< string(line.crbegin(), rcomma) << endl;
 ```
 - **move iterator**
 ---
+### Chepter 11 --- Associative array
+|type|explain|
+|----|----|
+|map|*key-value, the key is const*|
+|set|*the key is the value, only keep one recording*|
+|multimap|*key repeat is allowed*|
+|multiset|*the same as above*|
+|unordered_map|*Structed by hash function*|
+|unordered_set|*the same as above*|
+|unordered_multimap|...|
+|unordered_multiset|...|
+#### map
+
+|for map and unordered_map|explain|
+|----|---|
+|c[k]|*return the key is k mapped value, if k is not in c, add k to c, and init it by value*|
+|c.at(k)|*accese the key is k mapped value, if k is not in c, throw out a exception of out\_of\_range*|
+```C++
+map<string,size_t> word_count;
+string word;
+while (cin >> word)
+	++word_count[word];
+//if word is not in word_count, the above statement init it by value 0, and plus plus 1
+
+```
+- **pair**
+	1. *the pair's constructor default to init the member by value*
+	2. *the member is public*
+
+|form|explain|
+|-----|----|
+|pair\<T1,T2> p|*p is a pair inited by value*|
+|pair\<T1,T2> $p(v_1,v_2)$|*first is v1, second is v2*|
+|pair\<T1,T2\>p = {$v_1,v_2$}<br>pair\<$T_1,T_2$\> p{$v_1,v_2$}|*the same as above*|
+|make\_pair($v_1,v_2$)|*auto judge type*|
+|p.first|....|
+|p.second|...|
+|p1 *relop* p2|*relationship operator sign defined as dictory-seqence*|
+|p1 == p2|*only when first and second is each equal*|
+|p1 != p2|...|
+
+
+#### set 
+```C++
+bool compareIsbn(const Sale_data &lhs,const Sale_data &rhs){
+	return lhs.isbn() < rhs.isbn();
+}
+multiset<Sale_data, decltype(compareIsbn)*> bookstore(compareIsbn);
+```
+#### associative array's operatings
+- **add element**
+
+|form|explain|
+|---|---|
+|key\_type|*the type of the key*|
+|mapped\_type|*only use on map*|
+|value\_type|*for set, it is the same as key type<br>for map, it is pair<const key_type, mapped_type>*|
+|c.insert(v)<br>c.emplace(args)|*v type is value_type,args for constructing a element, return a pair, type is <iterator,bool>, for multi... insert always return the iterator point to the new element*|
+|c.insert(b,e)<br>c.insert(il)|*b,e is a range of a container whose type is c::value_type, il is a initializer list*|
+|c.insert(p,v)<br>c.emplace(p,args)|*p for a hint to insert*|
+
+- **delete element**  
+
+|form|explain|
+|----|---|
+|c.erase(k)|*delete key k, return a size_t val, to tell how many elements are deleted*|
+|c.erase\(p\)|*delete a element given by a iterator, p must a true element, couldn't equal to c.end(), return a iterator point to the next, if p point to the last element, then return c.end()*|
+|c.erase(b,e)|*delete the range of b to e,return e*|
+- **accese element**
+
+|form|explain|
+|----|--|
+|c.find(k)|*return a iterator point to the first k key value, if k is not in c, return c.end()*|
+|c.count(k)|*return the number of key k mapped value, for unmuli-container, the return value is always 0 or 1*|
+|c.lower\_bound(k)|*return a iterator point to the first key which is not less than k*|
+|c.upper\_bound(k)|*return a iterator point to the first key which is greater than k*|
+|c.equal\_range(k)|*return a iterator pair, to tell the range of key k, if k not exists, the two iterator all equal to c.end()*|
+
+#### Unordered\_container
+
+|form|explain|
+|----|---|
+|c.bucket\_count()|*the number of used bucket now*|
+|c.max\_bucket\_count()|*the max size of the bucket held by this container*|
+|c.bucket\_size(n)|*the number of the elements in the nth bucket*|
+|c.bucket(k)|*key k is in which bucket?*|
+
+
+
 ### Chepter 12 --- Dynamic memory
-- **shared_ptr**  
+#### shared_ptr  
 
 |Usage|explain|
 |----|---|
