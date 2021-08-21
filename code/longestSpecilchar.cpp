@@ -1,31 +1,62 @@
 #include<string>
 #include<iostream>
 #include<set>
+#include<algorithm>
+#include<vector>
 
 using namespace std;
 
 class Solution {
 public:
-	typedef pair<int,int> stalen;
+	typedef pair<int,int> poslen;
     int lengthOfLongestSubstring(string s) {
+		if(s.empty())return 0;
+		if((sz=s.size())==1)return 1;
 		dowork(s);
 		return res;	
     }
 private:
+	void cut(const string &s);
+	vector<poslen> record;
 	set<char> tmp;
-	int sz,len;
+	int sz,len,borde;
 	int res;
 	void init(const string &s);
 	void dowork(const string& s);	
+	void rangeScan(const poslen&,const string &s);
 	void check(const int& pos,const string&s);
 };
 
-void Solution::init(const string &s){
-	sz = s.size();
+inline bool mycompare(Solution::poslen &lhs,Solution::poslen &rhs){
+	return lhs.second>rhs.second;
+}
+
+void Solution::cut(const string &s){
+	int pre = 0;
+	int index = 1;
+	for(int i=0;i<borde;++i,++index){
+		if(s[i]==s[index]){
+			record.push_back({pre,index-pre});
+			pre = index;
+		}else continue;
+	}
+	record.push_back({pre,index-pre});
+	sort(record.begin(),record.end(),mycompare);
+}
+
+inline void Solution::init(const string &s){
 	res = 1;
+	borde = sz - 1;
 	return;
 }
 
+void Solution::rangeScan(const poslen& p,const string &s){
+	int times = 0;
+	while(times<p.second){
+		check(p.first+times,s);
+		++times;
+	}
+}
 
 void Solution::check(const int &pos,const string &s){
 	tmp.clear();
@@ -35,15 +66,22 @@ void Solution::check(const int &pos,const string &s){
 			len = i - pos;
 			if(len>res)res = len;
 			break;
-		}
+		}else if(i == borde){
+				len = i - pos + 1;
+				if(len>res)res = len;
+				break;
+			}			
 	return;
 }
 			
-
 void Solution::dowork(const string &s){
 	init(s);
-	for(int i=0;i<sz;++i){
-		check(i,s);
+	cut(s);
+	int rsz = record.size();
+	int brsz = rsz - 1;
+	for(int i=0;i<rsz;++i){
+		rangeScan(record[i],s);
+		if(i<brsz&&res>=record[i+1].second)break;
 	}
 	return;
 }
