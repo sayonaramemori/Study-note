@@ -16,7 +16,7 @@ public:
     }
 private:
 	bool check(const string&s1,const string&s2,const string&s3);
-	void moreMat(bool isOne,int&,int&,const string&,const string&);
+	int moreMat(bool isOne,int&,int&,const string&,const string&);
 	bool flag = false;
 	int p1;
 	size_t sz1;
