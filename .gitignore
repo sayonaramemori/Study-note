@@ -2,3 +2,4 @@
 /cpptest
 /.vscode
 /code/*.exe
+!/code/*.cpp
