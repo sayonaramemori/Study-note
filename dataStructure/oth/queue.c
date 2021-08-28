@@ -8,23 +8,37 @@ typedef struct{
 	ElemType data[MAXSIZ];
 }queue,*Queue;
 
-void Init(Queue q){
+void QueueInit(Queue q){
 	q->front = 0;
 	q->rear = 0;
 	return;
 }
 
-_Bool Push(Quene q,ElemType val){
+_Bool EnQueue(Queue q,ElemType val){
 	if((q->rear+1)%MAXSIZ==q->front)return 0;
-	data[q->rear] = val;
+	q->data[q->rear] = val;
 	q->rear = (q->rear+1)%MAXSIZ;
 	return 1;
 }
 
-_Bool DeQuene(Quene q,ElemType *e){
+_Bool DeQueue(Queue q,ElemType *e){
 	if(q->front==q->rear)return 0;
 	*e = q->data[q->front];
 	q->front = (q->front+1)%MAXSIZ;
 	return 1;
 }
 
+#if 1 
+int main(){
+	queue q;
+	QueueInit(&q);
+	for(int i=0;i<5;i++)EnQueue(&q,i);
+	int tmp;
+	for(int i=0;i<5;i++){
+		DeQueue(&q,&tmp);
+		printf("%d ",tmp);
+	}
+	printf("\n");
+	return 0;
+}
+#endif
