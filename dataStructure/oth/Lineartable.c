@@ -1,7 +1,7 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
-
+#include"Lineartable.h"
 /* operator of linear table
  * InitList(&L);
  * Length(L);
@@ -13,7 +13,7 @@
  * Empty(L);
  * DestroyList(&L);
 */
-
+#ifndef CVECTOR
 #define INIT_SIZE 20
 typedef struct{
 	void *seqence;
@@ -21,7 +21,7 @@ typedef struct{
 	int max_size;
 	size_t szt;
 }cvector;
-
+#endif
 void CvectorInit(cvector *,size_t);
 int CvectorSize(cvector*);
 _Bool CvectorIndex(cvector*,int,void*);
