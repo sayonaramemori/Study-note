@@ -381,12 +381,12 @@ bool RbTreeErase(RbTree *tree,const void *key){
 	while(flag){
 		type = getNodeType(target);
 		switch(type){
-			case 0://terminal node,can be red or blak
-				if(target->color==RED)
-				(target->parent->lchld==target)?(target->parent->lchld=NULL):(target->parent->rchld=NULL);
-				else if(target==tree->root){
-					tree->root = NULL;
-				}else handleBlackTerminal(tree,target);
+			case 0://terminal node,can be red or blak,if is red ,nothing need do
+				if(target->color==BLK){
+					if(target==tree->root){
+						tree->root = NULL;
+					}else handleBlackTerminal(tree,target);
+				}
 				flag = 0;
 				break;
 			case 1://target is must black
