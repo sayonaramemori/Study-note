@@ -1,9 +1,11 @@
 #include "RbTree.h"
+#include <time.h>
 #include "queue.h"
 #define RR 0
 #define RL 1
 #define LR 2
 #define LL 3
+
 static inline RbNode* parentOf(RbNode* cur);
 static inline RbNode* newRbNode(RbTree *tree,const void *key,const void *data);
 static inline void leftUp(RbTree*,RbNode *top);
@@ -24,6 +26,7 @@ static inline bool colorOf(const RbNode *cur){
 	return (cur==NULL)?BLK:cur->color;
 }
 
+//only free a node
 static inline void nodeClean(RbNode *cur){
 	free(cur->data);
 	free(cur->key);
@@ -63,6 +66,7 @@ static inline RbNode* newRbNode(RbTree *tree,const void *key,const void *data){
 	return node;
 }
 
+//newtop is the value between the max and min
 static inline void leftUp(RbTree *tree,RbNode *newTop){
 	RbNode *top = newTop->parent;
 	top->rchld = newTop->lchld;
@@ -96,68 +100,66 @@ void RbTreeInit(RbTree *tree,size_t szt,size_t szk,int (*keyCmp)(const void*,con
 	return;
 }
 
-//should receive cur's parent node
-void handleBroRed(RbTree *tree,RbNode *grandpa){
-	grandpa->lchld->color = BLK;
-	grandpa->rchld->color = BLK;
-	grandpa->color = RED;
-	//pgrandpa may be NULL,not promise grandpa exist his parent
-	RbNode *pgrandpa = parentOf(grandpa);
-	//grandpa is new root
-	if(pgrandpa==NULL){
-		grandpa->color = BLK;
-		return;
-	}else if(pgrandpa->color==BLK)return;
-	//Consider grandpa as a new insert node to treat
-	else fixAfterInsert(tree,grandpa);
-}
-
-//cur is the new inserted node
+//cur is the new inserted node, color is red, it has parent certainly
 //parent is the father of the new insert node
 static void fixAfterInsert(RbTree *tree,RbNode *cur){
-	RbNode* parent = parentOf(cur);
-	//parent of cur is exist,if the parent is root or black,return
-	if(parent->parent==NULL||parent->color==BLK){
-		parent->color = BLK;
-		return;
-	}
-	//parent is red:
-	RbNode *uncle = brotherOf(parent);
-	RbNode *grandpa = parentOf(parent);
-	if(uncle==NULL||uncle->color==BLK){
-		int type = 0;
-		if(parent->lchld==cur) type |= RL;
-		if(grandpa->lchld==parent) type |= LR;
-		switch(type){
-			case RR:
-				parent->color = BLK;
-				grandpa->color = RED;
-				leftUp(tree,parent);
-				break;
-			case RL:
-				cur->color = BLK;
-				grandpa->color = RED;
-				rightUp(tree,cur);
-				leftUp(tree,cur);
-				break;
-			case LR:
-				cur->color = BLK;
-				grandpa->color = RED;
-				leftUp(tree,cur);
-				rightUp(tree,cur);
-				break;
-			case LL:
-				parent->color = BLK;
-				grandpa->color = RED;
-				rightUp(tree,parent);
-				break;
-			default:
-				break;
+	RbNode* parent;
+    while(1){
+        parent = parentOf(cur);
+		//parent of cur is exist,if the parent is root or black,return
+		if(parent->parent==NULL||parent->color==BLK){
+			parent->color = BLK;
+			return;
 		}
-	}else{
-		handleBroRed(tree,grandpa);
-		return;
-	}
+		//parent is red:
+		RbNode *uncle = brotherOf(parent);
+		RbNode *grandpa = parentOf(parent);
+		if(colorOf(uncle)==BLK){
+			int type = 0;
+			if(parent->lchld==cur) type |= RL;
+			if(grandpa->lchld==parent) type |= LR;
+			switch(type){
+				case RR:
+					parent->color = BLK;
+					grandpa->color = RED;
+					leftUp(tree,parent);
+                    return;
+				case RL:
+					cur->color = BLK;
+					grandpa->color = RED;
+					rightUp(tree,cur);
+					leftUp(tree,cur);
+                    return;
+				case LR:
+					cur->color = BLK;
+					grandpa->color = RED;
+					leftUp(tree,cur);
+					rightUp(tree,cur);
+                    return;
+				case LL:
+					parent->color = BLK;
+					grandpa->color = RED;
+					rightUp(tree,parent);
+                    return;
+				default:
+					break;
+			}
+		}else{
+			grandpa->lchld->color = BLK;
+			grandpa->rchld->color = BLK;
+			grandpa->color = RED;
+			//pgrandpa may be NULL,not promise grandpa exist his parent
+			RbNode *pgrandpa = parentOf(grandpa);
+			//grandpa is new root
+			if(pgrandpa==NULL){
+				grandpa->color = BLK;
+				return;
+            }
+			if(pgrandpa->color==BLK)return;
+			//Consider grandpa as a new insert node to treat
+            cur = grandpa;
+		}
+    }
 }
 	
 
@@ -409,7 +411,14 @@ bool RbTreeErase(RbTree *tree,const void *key){
 	return 1;
 }
 
+
 #if 1
+typedef struct gooddata{
+    int a;
+    int b;
+    char c[10];
+}gooddata;
+
 int mycmp(const void*lhs,const void*rhs){
 	const int *ls = lhs;
 	const int *rs = rhs;
@@ -417,20 +426,21 @@ int mycmp(const void*lhs,const void*rhs){
 	if(*ls>*rs)return 1;
 	else return -1;
 }
+
 void print(const RbNode* node){
-	const int *val = node->data;
+	const gooddata *val = node->data;
 	if(node->parent==NULL){
 		if(node->color==RED)
-		printf("%2d R NULL\n",*val);
+		printf("%2d R NULL\n",val->a);
 		else
-		printf("%2d B NULL\n",*val);
+		printf("%2d B NULL\n",val->a);
 		return;
 	}
-	const int *pa = node->parent->data;
+	const gooddata *pa = node->parent->data;
 	if(node->color==RED)
-	printf("%2d R %2d\n",*val,*pa);
+	printf("%2d R %2d\n",val->a,pa->a);
 	else
-	printf("%2d B %2d\n",*val,*pa);
+	printf("%2d B %2d\n",val->a,pa->a);
 }
 
 void travel(RbTree* tree){
@@ -442,12 +452,14 @@ void travel(RbTree* tree){
 	queue q;
 	QueueInit(&q,sizeof(cur));
 	EnQueue(&q,&cur);
-	while(DeQueue(&q,&cur)){
+    int index=10;
+	while(DeQueue(&q,&cur)&&--index){
 		if(cur->lchld!=NULL)EnQueue(&q,&cur->lchld);
 		if(cur->rchld!=NULL)EnQueue(&q,&cur->rchld);
 		print(cur);
 	}
 	QueueDestroy(&q);
+    printf("the size of tree is %d\n",tree->size);
 	return;
 }
 
@@ -466,13 +478,19 @@ void testfind(RbTree *tree,int val){
 }
 
 void test(){
+    clock_t start =  clock();
 	RbTree t;
-	RbTreeInit(&t,sizeof(int),sizeof(int),mycmp);
-	for(int i=0;i<15;++i)
-		RbTreeInsert(&t,&i,&i);
-	int key = 3;
+    int max = 644400;
+	RbTreeInit(&t,sizeof(gooddata),sizeof(int),mycmp);
+	for(int i=0;i<max;++i){
+		RbTreeInsert(&t,&(gooddata){i,1,{'1'}},&i);
+    }
+    printf("time taken %.6fs\n",(double)(clock()-start)/CLOCKS_PER_SEC);
+    start = clock();
+	int key = max - 1;
 	travel(&t);
 	RbTreeErase(&t,&key);
+    printf("time taken %.6fs\n",(double)(clock()-start)/CLOCKS_PER_SEC);
 	travel(&t);
 	return;
 }
